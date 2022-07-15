@@ -12,6 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,23 +30,24 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
+    val greetingListState = remember { mutableStateListOf<String>("Micheal", "Arun") }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        GreetingList()
+        GreetingList(greetingListState) { greetingListState.add("vishnu") }
     }
 }
 
 @Composable
-fun GreetingList() {
-    val greetingListState = remember { mutableStateListOf<String>("Micheal", "Arun") }
+fun GreetingList(greetingListState: List<String>, buttonClick: () -> Unit) {
     for (name in greetingListState) {
         Greeting(name = name)
     }
 
-    Button(onClick = { greetingListState.add("vishnu") }) {
+    Button(onClick = buttonClick ) {
         Text(text = "Add new member")
     }
 }
