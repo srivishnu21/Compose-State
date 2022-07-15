@@ -11,10 +11,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,20 +21,19 @@ import androidx.compose.ui.tooling.preview.Preview
 var names: MutableList<String> = mutableListOf<String>("Micheal", "Madan", "Arun", "Foo", "Bar")
 
 class MainActivity : ComponentActivity() {
+    private val viewModel :MainViewModel = MainViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
+            MainScreen(viewModel)
         }
     }
 }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainViewModel) {
     val greetingListState = remember { mutableStateListOf<String>("Micheal", "Arun") }
-    val newNameState = remember {
-        mutableStateOf("")
-    }
+    val newNameState = viewModel.textFieldValue.observeAsState("")
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -43,33 +41,31 @@ fun MainScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GreetingList(
-            greetingListState,
-            { greetingListState.add(newNameState.value) },
-            newNameState.value,
-            { newName ->
-                newNameState.value = newName
-            })
+            newNameState.value
+        ) { newName ->
+            viewModel.onTxtChange(newName)
+        }
     }
 }
 
 @Composable
 fun GreetingList(
-    greetingListState: List<String>,
-    buttonClick: () -> Unit,
     textFieldSting: String, textFieldChange: (newName: String) -> Unit
 ) {
-    for (name in greetingListState) {
-        Greeting(name = name)
-    }
+//    for (name in greetingListState) {
+//        Greeting(name = name)
+//    }
 
 
     TextField(
         value = textFieldSting,
         onValueChange = textFieldChange
     )
+    
+    Greeting(name = textFieldSting)
 
-    Button(onClick = buttonClick) {
-        Text(text = "Add new member")
+    Button(onClick = { }) {
+        Text(text = textFieldSting)
     }
 }
 
@@ -81,5 +77,5 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    MainScreen()
+//    MainScreen(viewModel)
 }
